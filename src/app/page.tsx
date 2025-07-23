@@ -5,13 +5,14 @@ import Image from "next/image";
 import { connectWallet } from "@/lib/ethWallet";
 import WalletBar from "@/components/WalletBar";
 import MintNFT from "@/components/MintNFT";
+import ViewNFTs from "@/components/ViewNFTs";
 
 export default function Home() {
   const [file, setFile] = useState<File>();
   const [url, setUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [wallet, setWallet] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'upload' | 'mint'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'mint' | 'view'>('upload');
 
   const uploadFile = async () => {
     try {
@@ -90,6 +91,16 @@ export default function Home() {
               >
                 NFT Minting
               </button>
+              <button
+                onClick={() => setActiveTab('view')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'view'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                View NFTs
+              </button>
             </nav>
           </div>
         </div>
@@ -147,12 +158,18 @@ export default function Home() {
               <MintNFT wallet={wallet} />
             </div>
           )}
+
+          {activeTab === 'view' && (
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <ViewNFTs wallet={wallet} />
+            </div>
+          )}
         </div>
 
         {/* Info Section */}
         <div className="max-w-4xl mx-auto mt-8 bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-semibold mb-4">How it works</h3>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <div>
               <h4 className="font-medium text-blue-600 mb-2">IPFS Upload</h4>
               <div className="space-y-2 text-sm text-gray-600">
@@ -184,6 +201,23 @@ export default function Home() {
                 <div className="flex items-start gap-2">
                   <span className="bg-purple-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-semibold mt-0.5">3</span>
                   <span>NFT gets minted to your address</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-medium text-green-600 mb-2">View Collection</h4>
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex items-start gap-2">
+                  <span className="bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-semibold mt-0.5">1</span>
+                  <span>Browse your minted NFTs</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-semibold mt-0.5">2</span>
+                  <span>View all NFTs in the collection</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-semibold mt-0.5">3</span>
+                  <span>Access on Etherscan & OpenSea</span>
                 </div>
               </div>
             </div>
