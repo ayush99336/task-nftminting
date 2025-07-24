@@ -161,7 +161,7 @@ export default function Home() {
 
           {activeTab === 'view' && (
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <ViewNFTs wallet={wallet} />
+              <ViewNFTs />
             </div>
           )}
         </div>

@@ -12,65 +12,12 @@ export interface NFTData {
   };
 }
 
-export async function getUserNFTs(userAddress: string): Promise<NFTData[]> {
-  try {
-    // @ts-expect-error - Using window.ethereum for MetaMask
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const contract = new ethers.Contract(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_ABI, provider);
-    
-    const balance = await contract.balanceOf(userAddress);
-    const nfts: NFTData[] = [];
-    
-    // Since we don't have enumeration, we'll need to check tokens manually
-    // This is a fallback method - check the most recent tokens
-    const maxTokensToCheck = 100; // Reasonable limit
-    
-    for (let tokenId = 0; tokenId < maxTokensToCheck; tokenId++) {
-      try {
-        const owner = await contract.ownerOf(tokenId);
-        
-        // If this token belongs to the user, add it to the list
-        if (owner.toLowerCase() === userAddress.toLowerCase()) {
-          const tokenURI = await contract.tokenURI(tokenId);
-          
-          // Fetch metadata from IPFS
-          let metadata;
-          try {
-            const response = await fetch(tokenURI);
-            metadata = await response.json();
-          } catch (error) {
-            console.error('Error fetching metadata for token', tokenId.toString(), error);
-          }
-          
-          nfts.push({
-            tokenId: tokenId.toString(),
-            owner,
-            tokenURI,
-            metadata
-          });
-        }
-      } catch (error) {
-        // Token doesn't exist or other error - continue to next token
-        continue;
-      }
-      
-      // Stop if we've found all the user's tokens
-      if (nfts.length >= Number(balance)) {
-        break;
-      }
-    }
-    
-    return nfts;
-  } catch (error) {
-    console.error('Error fetching user NFTs:', error);
-    throw error;
-  }
-}
+// getUserNFTs is deprecated and not used anymore since we always show all NFTs
 
 export async function getAllNFTs(): Promise<NFTData[]> {
   try {
-    // @ts-expect-error - Using window.ethereum for MetaMask
-    const provider = new ethers.BrowserProvider(window.ethereum);
+    // Use a public JSON-RPC provider for Sepolia so view works without MetaMask
+    const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || 'https://rpc.sepolia.org');
     const contract = new ethers.Contract(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_ABI, provider);
     
     const nfts: NFTData[] = [];
